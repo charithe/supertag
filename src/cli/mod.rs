@@ -21,6 +21,7 @@ use std::path::Path;
 pub mod commands;
 pub mod handlers;
 pub mod ln;
+pub mod ls;
 pub mod rename;
 pub mod rm;
 pub mod rmdir;

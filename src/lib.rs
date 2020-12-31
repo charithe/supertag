@@ -45,6 +45,7 @@ pub mod platform;
 pub mod sql;
 
 pub use cli::ln::ln;
+pub use cli::ls::ls;
 pub use cli::rename::rename;
 pub use cli::rm::rm;
 pub use cli::rmdir::rmdir;

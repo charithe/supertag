@@ -17,6 +17,7 @@
  */
 pub mod fstab;
 pub mod ln;
+pub mod ls;
 pub mod mount;
 pub mod mv;
 pub mod rm;

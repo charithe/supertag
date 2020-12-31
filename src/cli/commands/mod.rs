@@ -17,6 +17,7 @@
  */
 mod fstab;
 mod ln;
+mod ls;
 mod mount;
 mod mv;
 mod rm;
@@ -39,5 +40,6 @@ pub fn add_subcommands<'a, 'b>(
     attached = rmdir::add_subcommands(attached);
     attached = rm::add_subcommands(attached);
     attached = fstab::add_subcommands(attached);
+    attached = ls::add_subcommands(attached);
     attached
 }

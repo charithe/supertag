@@ -23,7 +23,7 @@ use crate::common::types::file_perms::{Permissions, UMask};
 use crate::common::types::{DeviceFile, TagCollectible, TagType, UtcDt};
 use libc::{gid_t, mode_t, uid_t};
 use log::{debug, error, info, trace, warn};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 pub mod migrations;
@@ -142,6 +142,21 @@ fn to_tag_group(row: &Row) -> Result<TagGroup> {
         num_files: 0,
     };
     Ok(tg)
+}
+
+fn to_file_tags(row: &Row) -> Result<(String, Vec<String>)> {
+    let path = row.get(1)?;
+
+    let tags_str = row.get(2).ok().unwrap_or("".to_string());
+    let mut tags: Vec<String> = tags_str
+        .as_str()
+        .split(",")
+        .map(ToString::to_string)
+        .collect();
+
+    tags.sort();
+
+    Ok((path, tags))
 }
 
 pub fn get_now_secs() -> f64 {
@@ -736,6 +751,24 @@ pub fn tag_groups_for_tag(conn: &Connection, tag_id: i64) -> Result<Vec<TagGroup
 
     conn.prepare(&query)?
         .query_map(params![tag_id], to_tag_group)?
+        .collect()
+}
+
+pub fn file_tags_in_path(conn: &Connection, path: &str) -> Result<HashMap<String, Vec<String>>> {
+    info!(target: SQL_TAG, "Getting tagged files in path {:?}", path);
+    let query = "
+    SELECT 
+        f.id, 
+        f.path, 
+        GROUP_CONCAT(t.tag_name, ',') 
+    FROM files AS f, file_tag AS ft 
+    LEFT JOIN tags AS t ON (t.id = ft.tag_id) 
+    WHERE f.path LIKE ?1 AND f.id = ft.file_id 
+    GROUP BY f.id
+    ";
+
+    conn.prepare(&query)?
+        .query_map(params![path.to_owned() + "%"], to_file_tags)?
         .collect()
 }
 

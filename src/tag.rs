@@ -171,6 +171,7 @@ permissions="777""#,
 
     match matches.subcommand() {
         ("ln", Some(args)) => handlers::ln::handle(args, settings),
+        ("ls", Some(args)) => handlers::ls::handle(args, settings),
         ("mv", Some(args)) => handlers::mv::handle(args, settings),
         ("rm", Some(args)) => handlers::rm::handle(args, settings),
         ("rmdir", Some(args)) => handlers::rmdir::handle(args, settings),
